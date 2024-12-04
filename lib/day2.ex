@@ -29,10 +29,7 @@ defmodule Day2 do
     max_index = Enum.count(report) - 1
     reports = [report] ++ (0..max_index
     |> Enum.map(fn n ->
-      left = case n do
-        0 -> []
-        _ -> report |> Enum.slice(0..(n-1))
-      end
+      left = report |> Enum.take(n)
       right = report |> Enum.drop(n + 1)
       left ++ right
     end))
