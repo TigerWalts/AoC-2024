@@ -5,6 +5,7 @@ defmodule Day2 do
       {:test, 2} -> data_example_txt() |> part2()
       {:input, 1} -> data_txt() |> part1()
       {:input, 2} -> data_txt() |> part2()
+      _ -> {:error, "Invalid arguments. Expecting (:test | :input, 1 | 2)"}
     end
   end
 
