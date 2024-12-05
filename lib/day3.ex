@@ -95,6 +95,7 @@ defmodule Day3 do
     |> Stream.map(fn op ->
       case op do
         {:mul, arg1, arg2} -> arg1 * arg2
+        _ -> 0
       end
     end)
   end
