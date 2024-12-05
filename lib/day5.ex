@@ -21,23 +21,9 @@ defmodule Day5 do
     {rules, updates} = File.stream!(file)
     |> Stream.map(&String.trim/1)
     |> preprocess()
-    updates
-    |> Enum.map(fn update ->
-      if update == update
-      |> Enum.sort(fn (a, b) ->
-        case {[a, b] in rules, [b, a] in rules} do
-          {true, false} -> true
-          {false, true} -> false
-          {false, false} -> throw("No rule found for: #{[a,b]}, maybe we should ignore this") # e.g. return true
-          {true, true} -> throw("There are 2 rules with the same values but flipped: #{[a,b]} & #{[b,a]}")
-        end
-      end) do
-        {:ok, update}
-      else
-        :error
-      end
-    end)
-    |> Enum.reject(& &1 == :error)
+
+    check(updates, rules)
+    |> Enum.reject(fn {result, _} -> result == :fix end)
     |> Enum.map(fn {:ok, update} ->
       middle = update |> Enum.count() |> Integer.floor_div(2)
       {val, _rem} = update |> Enum.at(middle) |> Integer.parse()
@@ -46,8 +32,19 @@ defmodule Day5 do
     |> Enum.sum()
   end
 
-  def part2(_file) do
+  def part2(file) do
+    {rules, updates} = File.stream!(file)
+    |> Stream.map(&String.trim/1)
+    |> preprocess()
 
+    check(updates, rules)
+    |> Enum.reject(fn {result, _} -> result == :ok end)
+    |> Enum.map(fn {:fix, update} ->
+      middle = update |> Enum.count() |> Integer.floor_div(2)
+      {val, _rem} = update |> Enum.at(middle) |> Integer.parse()
+      val
+    end)
+    |> Enum.sum()
   end
 
   def preprocess(lines) do
@@ -64,6 +61,26 @@ defmodule Day5 do
       end
     end)
     {rules, updates}
+  end
+
+  def check(updates, rules) do
+    updates
+    |> Enum.map(fn update ->
+      sorted = update
+      |> Enum.sort(fn (a, b) ->
+        case {[a, b] in rules, [b, a] in rules} do
+          {true, false} -> true
+          {false, true} -> false
+          {false, false} -> throw("No rule found for: #{[a,b]}, maybe we should ignore this") # e.g. return true
+          {true, true} -> throw("There are 2 rules with the same values but flipped: #{[a,b]} & #{[b,a]}")
+        end
+      end)
+      if sorted == update do
+        {:ok, update}
+      else
+        {:fix, sorted}
+      end
+    end)
   end
 
   def parse_rule_line(line) do
