@@ -23,12 +23,7 @@ defmodule Day5 do
     |> preprocess()
 
     check(updates, rules)
-    |> Enum.reject(fn {result, _} -> result == :fix end)
-    |> Enum.map(fn {:ok, update} ->
-      middle = update |> Enum.count() |> Integer.floor_div(2)
-      {val, _rem} = update |> Enum.at(middle) |> Integer.parse()
-      val
-    end)
+    |> process(:ok)
     |> Enum.sum()
   end
 
@@ -38,12 +33,7 @@ defmodule Day5 do
     |> preprocess()
 
     check(updates, rules)
-    |> Enum.reject(fn {result, _} -> result == :ok end)
-    |> Enum.map(fn {:fix, update} ->
-      middle = update |> Enum.count() |> Integer.floor_div(2)
-      {val, _rem} = update |> Enum.at(middle) |> Integer.parse()
-      val
-    end)
+    |> process(:fix)
     |> Enum.sum()
   end
 
@@ -61,6 +51,16 @@ defmodule Day5 do
       end
     end)
     {rules, updates}
+  end
+
+  def process(updates, filter \\ :fix) do
+    updates
+    |> Enum.filter(fn {result, _update} -> result == filter end)
+    |> Enum.map(fn {_result, update} ->
+      middle = update |> Enum.count() |> Integer.floor_div(2)
+      {val, _rem} = update |> Enum.at(middle) |> Integer.parse()
+      val
+    end)
   end
 
   def check(updates, rules) do
