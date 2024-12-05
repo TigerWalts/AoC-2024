@@ -2,7 +2,7 @@ defmodule Day3 do
   def run(src, part) do
     case {src, part} do
       {:test, 1} -> data_example_txt() |> part1()
-      {:test, 2} -> data_example_txt() |> part2()
+      {:test, 2} -> data_example_txt_2() |> part2()
       {:input, 1} -> data_txt() |> part1()
       {:input, 2} -> data_txt() |> part2()
       _ -> {:error, "Invalid arguments. Expecting (:test | :input, 1 | 2)"}
@@ -11,6 +11,10 @@ defmodule Day3 do
 
   def data_example_txt() do
     Application.app_dir(:aoc2024, "/priv/day3_example.txt")
+  end
+
+  def data_example_txt_2() do
+    Application.app_dir(:aoc2024, "/priv/day3_example_2.txt")
   end
 
   def data_txt() do
@@ -25,8 +29,12 @@ defmodule Day3 do
     |> Enum.sum()
   end
 
-  def part2(_file) do
-
+  def part2(file) do
+    File.read!(file)
+    |> parse_command()
+    |> process2()
+    |> Enum.to_list()
+    |> Enum.sum()
   end
 
   def parse_command(content) do
@@ -36,6 +44,8 @@ defmodule Day3 do
         case acc do
           "" -> {:halt, acc}
           "mul" <> rest -> {parse_mul_args(rest) |> Enum.to_list(), rest}
+          "do()" <> rest -> {[:do], rest}
+          "don't()" <> rest -> {[:dont], rest}
           _ -> {[], String.slice(acc, 1..-1//1)}
         end
       end,
@@ -85,6 +95,19 @@ defmodule Day3 do
     |> Stream.map(fn op ->
       case op do
         {:mul, arg1, arg2} -> arg1 * arg2
+      end
+    end)
+  end
+
+  def process2(operations, do_add \\ true) do
+    operations
+    |> Stream.transform(do_add, fn op, acc ->
+      case op do
+        {:mul, arg1, arg2} when acc -> {[arg1 * arg2], acc}
+        {:mul, _arg1, _arg2} -> {[], acc}
+        :do -> {[], true}
+        :dont -> {[], false}
+        _ -> {:halt, acc}
       end
     end)
   end
