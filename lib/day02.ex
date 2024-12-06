@@ -1,4 +1,4 @@
-defmodule Day2 do
+defmodule Day02 do
   def run(src, part) do
     case {src, part} do
       {:test, 1} -> data_example_txt() |> part1()
@@ -10,11 +10,11 @@ defmodule Day2 do
   end
 
   def data_example_txt() do
-    Application.app_dir(:aoc2024, "/priv/day2_example.txt")
+    Application.app_dir(:aoc2024, "/priv/day02_example.txt")
   end
 
   def data_txt() do
-    Application.app_dir(:aoc2024, "/priv/day2.txt")
+    Application.app_dir(:aoc2024, "/priv/day02.txt")
   end
 
   def part1(file) do

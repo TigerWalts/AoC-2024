@@ -1,4 +1,4 @@
-defmodule Day6 do
+defmodule Day06 do
   def run(src, part) do
     case {src, part} do
       {:test, 1} -> data_example_txt() |> part1()
@@ -10,11 +10,11 @@ defmodule Day6 do
   end
 
   def data_example_txt() do
-    Application.app_dir(:aoc2024, "/priv/day6_example.txt")
+    Application.app_dir(:aoc2024, "/priv/day06_example.txt")
   end
 
   def data_txt() do
-    Application.app_dir(:aoc2024, "/priv/day6.txt")
+    Application.app_dir(:aoc2024, "/priv/day06.txt")
   end
 
   def load(file) do
@@ -32,9 +32,9 @@ defmodule Day6 do
 
     {max_x, max_y} = max
 
-    {pos, facing, visited} = process1(guard, blocks, max_x, max_y)
+    {_pos, _facing, visited} = process1(guard, blocks, max_x, max_y)
 
-    draw_grid(max, pos, facing, blocks, visited)
+    # draw_grid(max, pos, facing, blocks, visited)
 
     visited |> MapSet.size()
   end

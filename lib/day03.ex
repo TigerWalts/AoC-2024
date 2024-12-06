@@ -1,4 +1,4 @@
-defmodule Day3 do
+defmodule Day03 do
 
   @number_chars ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
@@ -13,15 +13,15 @@ defmodule Day3 do
   end
 
   def data_example_txt() do
-    Application.app_dir(:aoc2024, "/priv/day3_example.txt")
+    Application.app_dir(:aoc2024, "/priv/day03_example.txt")
   end
 
   def data_example_txt_2() do
-    Application.app_dir(:aoc2024, "/priv/day3_example_2.txt")
+    Application.app_dir(:aoc2024, "/priv/day03_example_2.txt")
   end
 
   def data_txt() do
-    Application.app_dir(:aoc2024, "/priv/day3.txt")
+    Application.app_dir(:aoc2024, "/priv/day03.txt")
   end
 
   def part1(file) do
