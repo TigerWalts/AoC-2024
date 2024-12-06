@@ -29,13 +29,16 @@ defmodule Day6 do
     {guard, blocks, max} = load(file)
     |> preprocess1()
     |> collate1()
+
     if guard == nil do
       throw("Error : Guard ('^') not found - Is it missing or do we not have any data?")
     end
     if max == nil do
       throw("Error : Max coordinates not found - Do we not have any data?")
     end
+
     {max_x, max_y} = max
+
     {pos, facing, visited} = Stream.unfold(0, fn
       i -> {i, i + 1}
     end)
@@ -52,12 +55,62 @@ defmodule Day6 do
         end
       end
     )
+
     draw_grid(max, pos, facing, blocks, visited)
+
     visited |> MapSet.size()
   end
 
-  def part2(_file) do
+  def part2(file) do
+    {guard, blocks, max} = load(file)
+    |> preprocess1()
+    |> collate1()
 
+    if guard == nil do
+      throw("Error : Guard ('^') not found - Is it missing or do we not have any data?")
+    end
+    if max == nil do
+      throw("Error : Max coordinates not found - Do we not have any data?")
+    end
+
+    {max_x, max_y} = max
+
+    0..max_x
+    |> Stream.map(fn x ->
+      0..max_y
+      |> Stream.map(fn y ->
+        {x,y}
+      end)
+    end)
+    |> Stream.concat()
+    |> Stream.map(fn new_block ->
+      new_blocks = blocks |> MapSet.put(new_block)
+      Stream.unfold(0, fn
+        i -> {i, i + 1}
+      end)
+      |> Enum.reduce_while(
+        {guard, :u, MapSet.new()}, # {guard loc, facing, visited}
+        fn _i, {pos, facing, visited} ->
+          will_loop = {pos, facing} in visited
+          new_pos = move(pos, facing)
+          blocked = new_pos in new_blocks
+          in_bounds = in_bounds(pos, max_x, max_y)
+          case {will_loop, blocked, in_bounds} do
+            {true, false, _} -> {:halt, {{:loop, new_block}, new_pos, facing, visited}}
+            {_, _, false} -> {:halt, {:exit, new_pos, facing, visited}}
+            {_, true, _} -> {:cont, {pos, facing |> next_facing(), visited}}
+            _ -> {:cont, {new_pos, facing, visited |> MapSet.put({pos, facing})}}
+          end
+        end
+      )
+    end)
+    |> Stream.reject(fn {term, _pos, _facing, _visited} -> term == :exit end)
+    |> Stream.map(fn {term, _pos, _facing, _visited} ->
+      {:loop, new_block} = term
+      new_block
+    end)
+    |> MapSet.new()
+    |> MapSet.size()
   end
 
   def preprocess1(stream) do
