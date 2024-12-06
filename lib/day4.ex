@@ -217,20 +217,4 @@ defmodule Day4 do
         |> flip(),            # BR->TL
     ]
   end
-
-  def transformations2(matrix) do
-    [
-      matrix |> rot_45(),     # TR->BL
-      matrix
-        |> rot_45()
-        |> flip(),            # BL->TR
-      matrix
-        |> flip()
-        |> rot_45(),          # TL->BR
-      matrix
-        |> flip()
-        |> rot_45()
-        |> flip(),            # BR->TL
-    ]
-  end
 end
