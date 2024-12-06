@@ -49,6 +49,7 @@ defmodule Day06 do
     {_pos, _facing, visited} = process1(guard, blocks, max_x, max_y)
 
     visited
+    |> MapSet.delete(guard)
     |> Stream.map(fn new_block ->
       new_blocks = blocks |> MapSet.put(new_block)
       Stream.cycle([nil])
