@@ -51,9 +51,7 @@ defmodule Day6 do
     visited
     |> Stream.map(fn new_block ->
       new_blocks = blocks |> MapSet.put(new_block)
-      Stream.unfold(0, fn
-        i -> {i, i + 1}
-      end)
+      Stream.cycle([nil])
       |> Enum.reduce_while(
         {guard, :u, MapSet.new()}, # {guard loc, facing, visited}
         fn _i, {pos, facing, visited} ->
@@ -112,9 +110,7 @@ defmodule Day6 do
   end
 
   def process1(guard, blocks, max_x, max_y) do
-    Stream.unfold(0, fn
-      i -> {i, i + 1}
-    end)
+    Stream.cycle([nil])
     |> Enum.reduce_while(
       {guard, :u, MapSet.new()}, # {guard loc, facing, visited}
       fn _i, {pos, facing, visited} ->
