@@ -31,8 +31,7 @@ defmodule Day01 do
       {a, b} = tup
       abs(a - b)
     end)
-    |> Enum.to_list()
-    |> Enum.sum()
+    |> Enum.reduce(0, & &1 + &2)
   end
 
   def part2(file) do
@@ -45,11 +44,11 @@ defmodule Day01 do
       |> Enum.frequencies()
     end)
     |> Enum.to_list()
+
     Map.to_list(left)
-    |> Enum.map(fn {k, v} ->
-      Map.get(right, k, 0) * k * v
+    |> Enum.reduce(0, fn {k, v}, acc ->
+      acc + (Map.get(right, k, 0) * k * v)
     end)
-    |> Enum.sum()
   end
 
   def parse_line(line) do
