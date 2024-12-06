@@ -71,12 +71,7 @@ defmodule Day6 do
       )
     end)
     |> Stream.reject(fn {term, _pos, _facing, _visited} -> term == :exit end)
-    |> Stream.map(fn {term, _pos, _facing, _visited} ->
-      {:loop, new_block} = term
-      new_block
-    end)
-    |> MapSet.new()
-    |> MapSet.size()
+    |> Enum.count()
   end
 
   def preprocess1(stream) do
