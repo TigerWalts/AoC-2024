@@ -30,62 +30,51 @@ defmodule Day07 do
 
     nums = right
     |> String.split()
+    |> Enum.map(fn num ->
+      {val, _rem} = num |> Integer.parse()
+      val
+    end)
 
     {target, nums}
   end
 
-  def process1({target, nums}, acc \\ 0) do
+  def process({target, nums}, operations) do
     case nums do
-      [] when acc == target -> {:pass, target}
-      [] -> :fail
-      _ when acc > target -> :fail # acc is always increasing
+      # success
+      [only] when only == target -> target
+      # failure fater the last operation
+      [_] -> 0
+      # failure before last operation, head is always increasing
+      [head | _tail] when head > target -> 0
+      # Fork and apply all operations on first and second
       _ ->
-        [head | tail] = nums
-        {operand, _rem} = Integer.parse(head)
-        mul = if acc == 0 do
-          process1({target, tail}, operand)
-        else
-          process1({target, tail}, acc * operand)
-        end
-        add = process1({target, tail}, acc + operand)
-        case {add, mul} do
-          {{:pass, target}, _} -> {:pass, target}
-          {_, {:pass, target}} -> {:pass, target}
-          _ -> :fail
-        end
+        {[first, second], tail} = nums |> Enum.split(2)
+        operations |> Enum.map(fn op ->
+          case op do
+            :mul -> process({target, [first * second | tail]}, operations)
+            :cat ->
+              {joined, _rem} = "#{first}#{second}" |> Integer.parse()
+              process({target, [joined | tail]}, operations)
+            :add -> process({target, [first + second | tail]}, operations)
+          end
+        end)
+        # Fork results are either 0 or the target, using max is equivalent to returning the target on any success
+        |> Enum.max()
     end
   end
 
-  def process2({target, nums}, acc \\ 0) do
-    case nums do
-      [] when acc == target -> {:pass, target}
-      [] -> :fail
-      _ when acc > target -> :fail # acc is always increasing
-      _ ->
-        [head | tail] = nums
-        {operand, _rem} = Integer.parse(head)
-        mul = if acc == 0 do
-          process2({target, tail}, operand)
-        else
-          process2({target, tail}, acc * operand)
-        end
-        {joined, _rem} = "#{acc}" <> head |> Integer.parse()
-        cat = process2({target, tail}, joined)
-        add = process2({target, tail}, acc + operand)
-        if [cat, add, mul] |> Enum.any?(& &1 != :fail) do
-          {:pass, target}
-        else
-          :fail
-        end
-    end
+  def process1(data) do
+    process(data, [:mul, :add])
+  end
+
+  def process2(data) do
+    process(data, [:mul, :cat, :add])
   end
 
   def part1(file) do
     load(file)
     |> Stream.map(&parse_line/1)
     |> Stream.map(&process1/1)
-    |> Stream.reject(& &1 == :fail)
-    |> Stream.map(fn {:pass, target} -> target end)
     |> Enum.sum()
   end
 
@@ -93,8 +82,6 @@ defmodule Day07 do
     load(file)
     |> Stream.map(&parse_line/1)
     |> Stream.map(&process2/1)
-    |> Stream.reject(& &1 == :fail)
-    |> Stream.map(fn {:pass, target} -> target end)
     |> Enum.sum()
   end
 end
