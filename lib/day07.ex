@@ -38,6 +38,11 @@ defmodule Day07 do
     {target, nums}
   end
 
+  def concat(first, second) do
+    {joined, _rem} = "#{first}#{second}" |> Integer.parse()
+    joined
+  end
+
   def process({target, nums}, operations) do
     case nums do
       # success
@@ -49,17 +54,30 @@ defmodule Day07 do
       # Fork and apply all operations on first and second
       _ ->
         {[first, second], tail} = nums |> Enum.split(2)
-        operations |> Enum.map(fn op ->
-          case op do
-            :mul -> process({target, [first * second | tail]}, operations)
-            :cat ->
-              {joined, _rem} = "#{first}#{second}" |> Integer.parse()
-              process({target, [joined | tail]}, operations)
-            :add -> process({target, [first + second | tail]}, operations)
+        Stream.resource(
+          fn -> operations end,
+          fn acc ->
+            case acc do
+              # No more operations
+              [] -> {:halt, acc}
+              # Pop first operation, process and emit the result
+              [op | todo] ->
+                case op do
+                  :cat -> {[process({target, [concat(first, second) | tail]}, operations)], todo}
+                  :mul -> {[process({target, [first * second | tail]}, operations)], todo}
+                  :add -> {[process({target, [first + second | tail]}, operations)], todo}
+                end
+            end
+          end,
+          fn _acc -> nil end
+        )
+        # Fork results are either 0 or the target, using max and lazily checking for non-zero
+        |> Enum.reduce_while(0, fn result, acc ->
+          case max(result, acc) do
+            0 -> {:cont, 0}
+            val -> {:halt, val}
           end
         end)
-        # Fork results are either 0 or the target, using max is equivalent to returning the target on any success
-        |> Enum.max()
     end
   end
 
