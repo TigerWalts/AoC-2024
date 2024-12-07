@@ -49,4 +49,12 @@ defmodule Aoc2024Test do
   test "Day 6 Part 2 Test 1" do
     assert Day06.run(:test, 2) == 6
   end
+
+  test "Day 7 Part 1 Test 1" do
+    assert Day07.run(:test, 1) == 3749
+  end
+
+  test "Day 7 Part 2 Test 1" do
+    assert Day07.run(:test, 2) == 11387
+  end
 end
