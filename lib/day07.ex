@@ -68,7 +68,7 @@ defmodule Day07 do
   end
 
   def process2(data) do
-    process(data, [:mul, :cat, :add])
+    process(data, [:cat, :mul, :add])
   end
 
   def part1(file) do
