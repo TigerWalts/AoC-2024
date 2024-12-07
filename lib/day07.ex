@@ -42,7 +42,7 @@ defmodule Day07 do
     case nums do
       # success
       [only] when only == target -> target
-      # failure fater the last operation
+      # failure after the last operation
       [_] -> 0
       # failure before last operation, head is always increasing
       [head | _tail] when head > target -> 0
