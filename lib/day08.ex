@@ -96,8 +96,6 @@ defmodule Day08 do
   end
 
   def get_antinodes_2(towers, max) do
-    {max_x, _max_y} = max
-
     towers
     |> pairs()
     |> Stream.map(fn {{x1, y1}, {x2, y2}} ->
@@ -105,19 +103,33 @@ defmodule Day08 do
       scalar = Integer.gcd(dx, dy)
       {dx, dy} = {Integer.floor_div(dx, scalar), Integer.floor_div(dy, scalar)}
 
-      {dx, dy, {first_x, first_y}} = if dx < 0 do
-        {-dx, -dy, {x2, y2}}
+      {dx, dy, first_x, first_y, steps_back, do_loop} = if abs(dx) > abs(dy) do
+        {dx, dy, {first_x, first_y}} = if dx < 0 do
+          {-dx, -dy, {x2, y2}}
+        else
+          {dx, dy, {x1, y1}}
+        end
+        steps_back = Integer.floor_div(first_x, dx)
+        do_loop = fn {x, _y}, {max_x, _max_y} -> x <= max_x end
+        {dx, dy, first_x, first_y, steps_back, do_loop}
       else
-        {dx, dy, {x1, y1}}
+        {dx, dy, {first_x, first_y}} = if dy < 0 do
+          {-dx, -dy, {x2, y2}}
+        else
+          {dx, dy, {x1, y1}}
+        end
+        steps_back = Integer.floor_div(first_y, dy)
+        do_loop = fn {_x, y}, {_max_x, max_y} -> y <= max_y end
+        {dx, dy, first_x, first_y, steps_back, do_loop}
       end
-      steps_back = Integer.floor_div(first_x, dx)
+
       start_x = first_x - (dx * steps_back)
       start_y = first_y - (dy * steps_back)
 
       Stream.resource(
         fn -> {start_x, start_y} end,
         fn {x, y} ->
-          if x <= max_x do
+          if do_loop.({x, y}, max) do
             {[{x, y}], {x + dx, y + dy}}
           else
             {:halt, {x, y}}
