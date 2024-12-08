@@ -95,6 +95,40 @@ defmodule Day08 do
     |> Stream.concat()
   end
 
+  def get_antinodes_2(towers, max) do
+    {max_x, _max_y} = max
+
+    towers
+    |> pairs()
+    |> Stream.map(fn {{x1, y1}, {x2, y2}} ->
+      {dx, dy} = {x2 - x1, y2 - y1}
+      scalar = Integer.gcd(dx, dy)
+      {dx, dy} = {Integer.floor_div(dx, scalar), Integer.floor_div(dy, scalar)}
+
+      {dx, dy, {first_x, first_y}} = if dx < 0 do
+        {-dx, -dy, {x2, y2}}
+      else
+        {dx, dy, {x1, y1}}
+      end
+      steps_back = Integer.floor_div(first_x, dx)
+      start_x = first_x - (dx * steps_back)
+      start_y = first_y - (dy * steps_back)
+
+      Stream.resource(
+        fn -> {start_x, start_y} end,
+        fn {x, y} ->
+          if x <= max_x do
+            {[{x, y}], {x + dx, y + dy}}
+          else
+            {:halt, {x, y}}
+          end
+        end,
+        fn _pair -> nil end
+      )
+    end)
+    |> Stream.concat()
+  end
+
   def in_bounds({test_x, test_y}, {max_x, max_y}) do
     test_x in 0..max_x and test_y in 0..max_y
   end
@@ -124,8 +158,21 @@ defmodule Day08 do
     |> MapSet.size()
   end
 
-  def part2(_file) do
+  def part2(file) do
+    {freq_towers, max} = load(file)
+    |> preprocess()
+    |> collate()
 
+    freq_towers
+    |> Map.values()
+    |> Stream.map(fn towers ->
+      towers
+      |> get_antinodes_2(max)
+      |> Stream.reject(& not in_bounds(&1, max))
+    end)
+    |> Stream.concat()
+    |> MapSet.new()
+    |> MapSet.size()
   end
 
   def parse_line(line) do
