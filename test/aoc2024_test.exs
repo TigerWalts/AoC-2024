@@ -71,6 +71,6 @@ defmodule Aoc2024Test do
   end
 
   test "Day 9 Part 2 Test 1" do
-    assert Day09.run(:test, 2) == :todo
+    assert Day09.run(:test, 2) == 2858
   end
 end
