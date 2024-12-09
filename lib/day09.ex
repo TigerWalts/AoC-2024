@@ -190,7 +190,6 @@ defmodule Day09 do
     |> compact_queue()
     |> Enum.to_list()
     |> expand()
-    |> Enum.to_list()
     |> Stream.with_index()
     |> Stream.map(fn {e, i} -> e * i end)
     |> Enum.sum()
