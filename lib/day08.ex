@@ -186,8 +186,4 @@ defmodule Day08 do
     |> MapSet.new()
     |> MapSet.size()
   end
-
-  def parse_line(line) do
-    line
-  end
 end
