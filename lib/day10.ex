@@ -74,26 +74,32 @@ defmodule Day10 do
     |> Enum.to_list()
   end
 
-  def process(grid, trailheads, max_x, max_y) do
+  def process(grid, trailheads, max_x, max_y, rating_type) do
     # trailheads |> IO.inspect()
     Enum.reduce(
       1..9,
       trailheads,
       fn next_height, trailheads ->
-        trailheads
+        trailheads = trailheads
         |> Stream.map(fn trailhead ->
           trailhead |> next_trailheads(grid, next_height, max_x, max_y)
         end)
         |> Enum.to_list()
         |> List.flatten()
-        |> Enum.sort(fn {ax, ay, a_id}, {bx, by, b_id} ->
-          case {by - ay, bx - ax, b_id - a_id} do
-            {0, 0, diff} -> diff >= 0
-            {0, diff, _} -> diff >= 0
-            {diff, _, _} -> diff >= 0
-          end
-        end)
-        |> Enum.dedup()
+
+        case rating_type do
+          :unique -> trailheads
+          :pairs ->
+            trailheads
+            |> Enum.sort(fn {ax, ay, a_id}, {bx, by, b_id} ->
+              case {by - ay, bx - ax, b_id - a_id} do
+                {0, 0, diff} -> diff >= 0
+                {0, diff, _} -> diff >= 0
+                {diff, _, _} -> diff >= 0
+              end
+            end)
+            |> Enum.dedup()
+        end
       end
     )
   end
@@ -106,12 +112,20 @@ defmodule Day10 do
     trailheads = get_grid_trailheads(grid)
     |> Enum.to_list()
 
-    process(grid, trailheads, max_x, max_y)
+    process(grid, trailheads, max_x, max_y, :pairs)
     |> Enum.count()
   end
 
-  def part2(_file) do
+  def part2(file) do
+    grid = load(file) |> Enum.to_list()
 
+    {max_x, max_y} = get_grid_max_x_y(grid)
+
+    trailheads = get_grid_trailheads(grid)
+    |> Enum.to_list()
+
+    process(grid, trailheads, max_x, max_y, :unique)
+    |> Enum.count()
   end
 
   def parse_line(line) do
