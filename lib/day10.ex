@@ -22,20 +22,15 @@ defmodule Day10 do
     |> Stream.map(fn line ->
       line = line |> String.trim()
       for <<a::utf8 <- line>> do
-        if <<a::utf8>> == "." do
-          -1
-        else
-          {val, _rem} = Integer.parse(<<a::utf8>>)
-          val
-        end
+        {val, _rem} = Integer.parse(<<a::utf8>>)
+        val
       end
     end)
   end
 
   def get_grid_max_x_y(grid) do
-    y_count = Enum.at(grid,0) |> Enum.count()
     {
-      y_count - 1,
+      (Enum.at(grid,0) |> Enum.count()) - 1,
       Enum.count(grid) - 1
     }
   end
@@ -59,18 +54,10 @@ defmodule Day10 do
 
   def next_trailheads({x, y, id}, grid, next_height, max_x, max_y) do
     [{0, -1}, {-1, 0}, {1, 0}, {0, 1}]
-    |> List.flatten()
     |> Stream.map(fn {dx, dy} -> {x + dx, y + dy} end)
-    |> Stream.filter(fn {cx, cy} ->
-      cx in 0..(max_x) and cy in 0..(max_y)
-    end)
-    |> Stream.filter(fn {cx, cy} ->
-      candidate_height = Enum.at(grid, cy) |> Enum.at(cx)
-      candidate_height == next_height
-    end)
-    |> Stream.map(fn {cx, cy} ->
-      {cx, cy, id}
-    end)
+    |> Stream.filter(fn {cx, cy} -> cx in 0..(max_x) and cy in 0..(max_y) end)
+    |> Stream.filter(fn {cx, cy} -> next_height == Enum.at(grid, cy) |> Enum.at(cx) end)
+    |> Stream.map(fn {cx, cy} -> {cx, cy, id} end)
     |> Enum.to_list()
   end
 
@@ -109,8 +96,7 @@ defmodule Day10 do
 
     {max_x, max_y} = get_grid_max_x_y(grid)
 
-    trailheads = get_grid_trailheads(grid)
-    |> Enum.to_list()
+    trailheads = get_grid_trailheads(grid) |> Enum.to_list()
 
     process(grid, trailheads, max_x, max_y, :pairs)
     |> Enum.count()
@@ -121,14 +107,9 @@ defmodule Day10 do
 
     {max_x, max_y} = get_grid_max_x_y(grid)
 
-    trailheads = get_grid_trailheads(grid)
-    |> Enum.to_list()
+    trailheads = get_grid_trailheads(grid) |> Enum.to_list()
 
     process(grid, trailheads, max_x, max_y, :unique)
     |> Enum.count()
-  end
-
-  def parse_line(line) do
-    line
   end
 end
