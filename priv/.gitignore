@@ -1,2 +1,4 @@
 *
+!.gitignore
+!day00.txt
 !day*_example*.txt
